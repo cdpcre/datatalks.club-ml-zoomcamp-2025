@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 # Load the pipeline
 with open("pipeline_v1.bin", "rb") as f:
-    model = pickle.load(f)
+    pipeline = pickle.load(f)
 
 # Define the input schema
 class Client(BaseModel):
@@ -23,8 +23,8 @@ app = FastAPI()
 
 @app.post("/predict")
 def predict(client: Client) -> PredictResponse:
-    X = [client.dict()]
-    proba = model.predict_proba(X)[0, 1]
+    X = [client.model_dump()]
+    proba = pipeline.predict_proba(X)[0, 1]
     return PredictResponse(subscription_probability=proba)
 
 if __name__ == "__main__":

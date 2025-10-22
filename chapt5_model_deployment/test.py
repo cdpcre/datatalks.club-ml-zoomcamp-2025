@@ -2,7 +2,7 @@ import requests
 
 # url = 'https://mlzoomcamp-flask-uv.fly.dev/predict'
 
-url = "http://127.0.0.1:8000/predict"
+url = "http://0.0.0.0:9696/predict"
 client = {
     "lead_source": "organic_search",
     "number_of_courses_viewed": 4,
