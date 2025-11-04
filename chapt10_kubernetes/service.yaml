@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bank-marketing-service
+  labels:
+    app: bank-marketing
+spec:
+  type: LoadBalancer
+  selector:
+    app: bank-marketing
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9696
+---
+# Configuration Notes:
+#
+# SERVICE TYPE: LoadBalancer
+#   - Exposes the service externally
+#   - In kind, this will be pending external IP
+#   - Use port-forward for local testing:
+#     kubectl port-forward service/bank-marketing-service 9696:80
+#
+# SELECTOR: app=bank-marketing
+#   - IMPORTANT: This must match the labels in the Deployment
+#   - This is the answer for Question 7
+#   - Routes traffic to pods with label "app: bank-marketing"
+#
+# PORT: 80
+#   - External port that the service listens on
+#   - This is what you specify when port-forwarding
+#
+# TARGET PORT: 9696
+#   - Internal port where the container is listening
+#   - Must match the containerPort in the Deployment
+#
+# PROTOCOL: TCP
+#   - Standard protocol for HTTP/REST APIs
+#
+# To test the service locally:
+#   1. Port forward: kubectl port-forward service/bank-marketing-service 9696:80
+#   2. Test: python test_prediction.py --url http://localhost:9696/predict
+#
+# To check the service:
+#   kubectl get services
+#   kubectl describe service bank-marketing-service

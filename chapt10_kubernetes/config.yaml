@@ -1,0 +1,250 @@
+# =============================================================================
+# Kubernetes Homework Configuration
+# =============================================================================
+# This file contains all configurable parameters for the homework.
+# Modify values here to update the entire deployment.
+# =============================================================================
+
+# Docker Configuration
+docker:
+  image_name: zoomcamp-model
+  image_tag: 3.11.5-hw10
+  registry: svizor  # Docker Hub username (for pulling pre-built image)
+  pull_policy: IfNotPresent  # Never pull from registry (use local image)
+
+# Kubernetes Configuration
+kubernetes:
+  cluster_name: ml-zoomcamp-cluster
+  namespace: default
+
+  # Deployment
+  deployment:
+    name: bank-marketing-deployment
+    replicas: 1
+    labels:
+      app: bank-marketing
+      version: v1
+      environment: homework
+
+  # Service
+  service:
+    name: bank-marketing-service
+    type: LoadBalancer  # LoadBalancer, NodePort, or ClusterIP
+    port: 80            # External port
+    target_port: 9696   # Container port
+    protocol: TCP
+
+  # Horizontal Pod Autoscaler
+  hpa:
+    name: bank-marketing-hpa
+    enabled: true
+    min_replicas: 1
+    max_replicas: 3
+    cpu_threshold: 20  # Percentage
+    scale_up_stabilization: 0  # seconds
+    scale_down_stabilization: 30  # seconds
+
+# Resource Configuration
+resources:
+  requests:
+    memory: 64Mi
+    cpu: 100m  # 0.1 CPU
+  limits:
+    memory: 128Mi
+    cpu: 200m  # 0.2 CPU
+
+# Application Configuration
+application:
+  container_port: 9696
+  host_port: 9696  # For port forwarding
+  health_check:
+    enabled: false  # Set to true if the app has health endpoints
+    liveness_path: /health
+    readiness_path: /ready
+    initial_delay: 10
+    period: 10
+
+# Test Data Configuration
+test_data:
+  # Default client data for predictions (Question 1 & 6)
+  default_client:
+    job: management
+    duration: 400
+    poutcome: success
+
+  # Alternative test cases
+  test_cases:
+    - name: case1_student
+      data:
+        job: student
+        duration: 100
+        poutcome: unknown
+
+    - name: case2_technician
+      data:
+        job: technician
+        duration: 300
+        poutcome: failure
+
+    - name: case3_retired
+      data:
+        job: retired
+        duration: 600
+        poutcome: success
+
+# Load Testing Configuration
+load_test:
+  default_requests: 1000
+  default_workers: 10
+  default_delay: 0.01  # seconds between requests
+  timeout: 10  # seconds per request
+
+  # Scenarios
+  scenarios:
+    light:
+      requests: 100
+      workers: 5
+      delay: 0.05
+
+    medium:
+      requests: 1000
+      workers: 10
+      delay: 0.01
+
+    heavy:
+      requests: 5000
+      workers: 20
+      delay: 0.001
+
+    stress:
+      requests: 10000
+      workers: 50
+      delay: 0
+
+# Homework Questions Configuration
+homework:
+  questions:
+    q1:
+      description: "Model probability for default test case"
+      options: [0.287, 0.530, 0.757, 0.960]
+      test_locally: true
+
+    q2:
+      description: "Kind version"
+      command: "kind --version"
+
+    q3:
+      description: "Smallest deployable unit in Kubernetes"
+      answer: "Pod"
+      options: [Node, Pod, Deployment, Service]
+
+    q4:
+      description: "Default service type after cluster creation"
+      answer: "ClusterIP"
+      options: [NodePort, ClusterIP, ExternalName, LoadBalancer]
+
+    q5:
+      description: "Command to load Docker image into kind"
+      answer: "kind load docker-image"
+
+    q6:
+      description: "Container port in deployment"
+      answer: 9696
+      file: "deployment.yaml"
+      path: "spec.template.spec.containers[0].ports[0].containerPort"
+
+    q7:
+      description: "Service selector value"
+      answer: "bank-marketing"
+      file: "service.yaml"
+      path: "spec.selector.app"
+
+    q8:
+      description: "Maximum replicas during load test"
+      options: [1, 2, 3, 4]
+      requires_hpa: true
+      requires_load_test: true
+
+# Monitoring Configuration
+monitoring:
+  metrics_server:
+    enabled: true
+    version: latest
+    insecure_tls: true  # Required for kind
+
+  # Commands for monitoring
+  commands:
+    watch_hpa: "kubectl get hpa -w"
+    watch_pods: "kubectl get pods -w"
+    top_nodes: "kubectl top nodes"
+    top_pods: "kubectl top pods"
+
+# Environment-specific Configuration
+environments:
+  development:
+    replicas: 1
+    hpa_enabled: false
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 100m
+      limits:
+        memory: 128Mi
+        cpu: 200m
+
+  testing:
+    replicas: 1
+    hpa_enabled: true
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 100m
+      limits:
+        memory: 128Mi
+        cpu: 200m
+
+  production:
+    replicas: 3
+    hpa_enabled: true
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 200m
+      limits:
+        memory: 256Mi
+        cpu: 500m
+
+# Notes and Documentation
+notes:
+  - "This configuration file is for documentation and reference"
+  - "Actual values are used in YAML files and Python scripts"
+  - "To apply changes, edit the respective YAML files or script constants"
+  - "This file can be parsed programmatically if needed"
+
+# Useful Commands (for reference)
+commands:
+  setup:
+    - "./setup_cluster.sh"
+    - "kind create cluster --name ml-zoomcamp-cluster"
+    - "kind load docker-image zoomcamp-model:3.11.5-hw10"
+
+  deploy:
+    - "./deploy_all.sh"
+    - "kubectl apply -f deployment.yaml"
+    - "kubectl apply -f service.yaml"
+    - "kubectl apply -f hpa.yaml"
+
+  test:
+    - "python test_prediction.py"
+    - "python load_test.py --requests 1000"
+    - "kubectl port-forward service/bank-marketing-service 9696:80"
+
+  monitor:
+    - "kubectl get all"
+    - "kubectl get hpa -w"
+    - "kubectl top pods"
+    - "kubectl logs deployment/bank-marketing-deployment"
+
+  cleanup:
+    - "./cleanup.sh"
+    - "kind delete cluster --name ml-zoomcamp-cluster"

@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-marketing-deployment
+  labels:
+    app: bank-marketing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank-marketing
+  template:
+    metadata:
+      labels:
+        app: bank-marketing
+    spec:
+      containers:
+      - name: bank-marketing
+        image: zoomcamp-model:3.11.5-hw10
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9696
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        env:
+        - name: MODEL_NAME
+          value: "bank-marketing"
+---
+# Configuration Notes:
+#
+# IMAGE: zoomcamp-model:3.11.5-hw10
+#   - Make sure to load this image into kind cluster first:
+#     kind load docker-image zoomcamp-model:3.11.5-hw10 --name <cluster-name>
+#
+# CONTAINER PORT: 9696
+#   - This is the port where the Flask app listens inside the container
+#   - IMPORTANT: Record this value for Question 6
+#
+# RESOURCES:
+#   - Memory request: 64Mi (minimum memory reserved)
+#   - Memory limit: 128Mi (maximum memory allowed)
+#   - CPU request: 100m (minimum CPU reserved, 0.1 CPU)
+#   - CPU limit: 200m (maximum CPU allowed, 0.2 CPU)
+#   - These values are specified in the homework requirements
+#
+# REPLICAS: 1
+#   - Initial number of pods
+#   - Will be managed by HPA if autoscaling is enabled
+#
+# LABELS: app=bank-marketing
+#   - Used by Service selector to route traffic to these pods
+#   - Used by HPA to target this deployment
+#
+# IMAGE PULL POLICY: IfNotPresent
+#   - Required for kind, as the image is loaded locally
+#   - Prevents trying to pull from Docker Hub
