@@ -1,0 +1,15 @@
+# Python dependencies for Chapter 9 - Serverless Homework
+
+# Deep Learning
+tensorflow>=2.14.0
+numpy>=1.23.1
+
+# Image Processing
+pillow>=9.0.0
+
+# Jupyter (optional, for running the notebook)
+jupyter>=1.0.0
+ipython>=8.0.0
+
+# For local development and testing
+# Note: tflite-runtime is used in Lambda, but tensorflow includes it for development

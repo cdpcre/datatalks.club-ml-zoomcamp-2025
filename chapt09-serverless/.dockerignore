@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Models (large files - model is in base image)
+*.keras
+*.h5
+*.tflite
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README.md
+homework_reference.md
+
+# Test scripts (not needed in container)
+q1_convert_model.py
+q2_model_info.py
+q3_preprocess_image.py
+q4_inference.py
+test_lambda_local.py
+requirements.txt
