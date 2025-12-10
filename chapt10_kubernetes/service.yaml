@@ -1,0 +1,33 @@
+# Service for ML Zoomcamp Chapter 10 Kubernetes Homework
+# Based on homework requirements from:
+# https://github.com/DataTalksClub/machine-learning-zoomcamp/blob/master/cohorts/2025/10-kubernetes/homework.md
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: subscription
+spec:
+  type: LoadBalancer
+  selector:
+    app: subscription
+  ports:
+    - port: 80
+      targetPort: 9696
+---
+# ANSWERS REFERENCE:
+#
+# Q7: The value for <???> in selector is: subscription
+#     This matches the label in the deployment's pod template
+#
+# SERVICE TYPE: LoadBalancer
+#   - Required by homework specification
+#
+# PORT: 80
+#   - External port the service listens on
+#
+# TARGET PORT: 9696
+#   - Internal port where container listens (containerPort from deployment)
+#
+# To test the service:
+#   kubectl port-forward service/subscription 9696:80
+#   python q6_test.py
